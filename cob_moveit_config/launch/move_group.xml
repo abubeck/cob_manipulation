@@ -15,15 +15,15 @@
   <arg name="allow_trajectory_execution" default="true"/>
   <arg name="max_safe_path_cost" default="1"/>
   <arg name="jiggle_fraction" default="0.05" />
-  <arg name="publish_monitored_planning_scene" default="false"/>
+  <arg name="publish_monitored_planning_scene" default="true"/>
 
   <include file="$(find cob_moveit_config)/launch/planning_context.xml">
     <arg name="robot" value="$(arg robot)"/>
   </include>
 
   <rosparam file="$(arg config_path)/controllers.yaml" ns="move_group"/>
-  <param name="move_group/use_controller_manager" value="false"/>
-  <param name="move_group/moveit_controller_manager" value="pr2_moveit_controller_manager/Pr2MoveItControllerManager"/>
+  <param name="move_group/use_controller_manager" value="true"/>
+  <param name="move_group/moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
   
   <include ns="move_group" file="$(find cob_moveit_config)/launch/planning_pipeline.xml">
       <arg name="pipeline" value="$(arg pipeline)"/>
