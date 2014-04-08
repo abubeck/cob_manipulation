@@ -59,7 +59,7 @@ public:
 
         if(torso_available)
         {
-            XmlRpc::XmlRpcValue tj;
+            /*XmlRpc::XmlRpcValue tj;
             nh.getParam("/torso_controller/joint_names", tj);
             ROS_ASSERT(tj.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
@@ -67,14 +67,18 @@ public:
             {
               ROS_ASSERT(tj[i].getType() == XmlRpc::XmlRpcValue::TypeString);
               torso_joints.push_back(tj[i]);
-            }
+            }*/
             
             if(head_available)
             {
                 XmlRpc::XmlRpcValue hj;
-                nh.getParam("/head_controller/JointName", hj);
-                ROS_ASSERT(hj.getType() == XmlRpc::XmlRpcValue::TypeString);
-                head_joints.push_back(hj);
+                nh.getParam("/head_controller/joints", hj);
+                ROS_ASSERT(hj.getType() == XmlRpc::XmlRpcValue::TypeArray);
+                for (int32_t i = 0; i < hj.size(); ++i) 
+                {
+                  ROS_ASSERT(hj[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+                  head_joints.push_back(hj[i]);
+                }
 
                 //nh.getParam("/head_controller/joints", hj);
                 //ROS_ASSERT(hj.getType() == XmlRpc::XmlRpcValue::TypeArray);
@@ -88,7 +92,7 @@ public:
             
             //additional lookat joints
             lookat_joints.clear();
-            lookat_joints = torso_joints;
+            lookat_joints = head_joints;
             lookat_joints.push_back("lookat_lin_joint");        
             lookat_joints.push_back("lookat_x_joint");
             lookat_joints.push_back("lookat_y_joint");
@@ -117,7 +121,7 @@ public:
         bool success = false;
         
         //  publish  info  to  the  console  for  the  user
-        //ROS_INFO("%s:  New Goal!",  lookat_action_name.c_str());
+        ROS_INFO("%s:  New Goal!",  lookat_action_name.c_str());
         
         moveit_msgs::GetPositionIK  srv;
         srv.request.ik_request.group_name  =  "lookat";
@@ -168,21 +172,29 @@ public:
         std::vector<double>  head_config;
         head_config.resize(head_joints.size());    
         
+        int h = head_joints.size() - 1;
+        ROS_INFO("Test: %s , %s", head_joints[0].c_str(), head_joints[1].c_str());
         if(success)
         {
             for(unsigned  int  i=0, j=0;  i<srv.response.solution.joint_state.name.size();  i++)
             {
-                //ROS_INFO("%s:  %f",  srv.response.solution.joint_state.name[i].c_str(),  srv.response.solution.joint_state.position[i]);
+                ROS_INFO("%s:  %f",  srv.response.solution.joint_state.name[i].c_str(),  srv.response.solution.joint_state.position[i]);
                 if(j<torso_joints.size() && srv.response.solution.joint_state.name[i]==torso_joints[j])
                 {
                     torso_config[j]  =  srv.response.solution.joint_state.position[i];
-		    j++;
-		}
-		if(srv.response.solution.joint_state.name[i]  ==  "lookat_lin_joint")
+		              j++;
+		        }
+                if(h>=0 && srv.response.solution.joint_state.name[i]==head_joints[h])
+                {
+                    ROS_INFO("Found joint name %s", srv.response.solution.joint_state.name[i].c_str());
+                    head_config[h]  =  srv.response.solution.joint_state.position[i];
+                    h--;
+                }
+		     /* if(srv.response.solution.joint_state.name[i]  ==  "lookat_lin_joint")
 		    if(srv.response.solution.joint_state.position[i] >= 0)
                         head_config[0] = 0.0;   //look backwards
                     else
-                        head_config[0] = -3.1415926;    //lock forwards
+                        head_config[0] = -3.1415926;    //lock forwards*/
             }
         }
         
@@ -205,10 +217,10 @@ public:
         head_point.time_from_start = ros::Duration(1.0);
         head_goal.trajectory.points.push_back(head_point);
         
-        torso_ac->sendGoal(torso_goal);
+        //torso_ac->sendGoal(torso_goal);
         head_ac->sendGoal(head_goal);
         
-        bool finished_before_timeout = torso_ac->waitForResult(ros::Duration(5.0)) && head_ac->waitForResult(ros::Duration(5.0));
+        bool finished_before_timeout = /*torso_ac->waitForResult(ros::Duration(5.0)) &&*/ head_ac->waitForResult(ros::Duration(5.0));
 
         if  (finished_before_timeout)
         {
