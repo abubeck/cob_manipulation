@@ -1,3 +1,4 @@
+max_solver_iterations: 20
 arm:
   kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
   #kinematics_solver: cob_kinematics/IKFast_ur10
