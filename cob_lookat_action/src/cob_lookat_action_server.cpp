@@ -57,8 +57,8 @@ public:
         ROS_WARN("Waiting for Head-AS");
         head_available = head_ac->waitForServer(ros::Duration(10.0));
 
-        if(torso_available)
-        {
+        //if(torso_available)
+        //{
             /*XmlRpc::XmlRpcValue tj;
             nh.getParam("/torso_controller/joint_names", tj);
             ROS_ASSERT(tj.getType() == XmlRpc::XmlRpcValue::TypeArray);
@@ -109,7 +109,7 @@ public:
             lookat_as->start();
             
             return true;
-        }
+        //}
         
         ROS_ERROR("No torso_controller loaded!");
         return false;
@@ -214,7 +214,7 @@ public:
         head_goal.trajectory.joint_names = head_joints;
         trajectory_msgs::JointTrajectoryPoint  head_point;
         head_point.positions = head_config;
-        head_point.time_from_start = ros::Duration(1.0);
+        head_point.time_from_start = ros::Duration(5.0);
         head_goal.trajectory.points.push_back(head_point);
         
         //torso_ac->sendGoal(torso_goal);
