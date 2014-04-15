@@ -45,6 +45,7 @@
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/move_group_interface/move_group.h>
 #include <shape_tools/solid_primitive_dims.h>
+#include <moveit_msgs/Grasp.h>
 
 #include <cob_pick_place_action/CobPickAction.h>
 #include <cob_pick_place_action/CobPlaceAction.h>
@@ -89,15 +90,15 @@ public:
 
 	void insertObject(std::string object_name, unsigned int object_class, geometry_msgs::PoseStamped object_pose);
 	
-	void fillAllGraspsKIT(unsigned int objectClassId, geometry_msgs::PoseStamped object_pose, std::vector<manipulation_msgs::Grasp> &grasps);
-	void fillSingleGraspKIT(unsigned int objectClassId, unsigned int grasp_id, geometry_msgs::PoseStamped object_pose, std::vector<manipulation_msgs::Grasp> &grasps);
-	void convertGraspKIT(Grasp* current_grasp, geometry_msgs::PoseStamped object_pose, std::vector<manipulation_msgs::Grasp> &grasps);
+	void fillAllGraspsKIT(unsigned int objectClassId, geometry_msgs::PoseStamped object_pose, std::vector<moveit_msgs::Grasp> &grasps);
+	void fillSingleGraspKIT(unsigned int objectClassId, unsigned int grasp_id, geometry_msgs::PoseStamped object_pose, std::vector<moveit_msgs::Grasp> &grasps);
+	void convertGraspKIT(Grasp* current_grasp, geometry_msgs::PoseStamped object_pose, std::vector<moveit_msgs::Grasp> &grasps);
 	
-	void fillGraspsOR(unsigned int objectClassId, unsigned int grasp_id, geometry_msgs::PoseStamped object_pose, std::vector<manipulation_msgs::Grasp> &grasps);
+	void fillGraspsOR(unsigned int objectClassId, unsigned int grasp_id, geometry_msgs::PoseStamped object_pose, std::vector<moveit_msgs::Grasp> &grasps);
 	
-	sensor_msgs::JointState MapHandConfiguration(sensor_msgs::JointState table_config);
+	trajectory_msgs::JointTrajectory MapHandConfiguration(sensor_msgs::JointState table_config);
 	tf::Transform transformPose(tf::Transform transform_O_from_SDH, tf::Transform transform_HEADER_from_OBJECT, std::string object_frame_id);
-	manipulation_msgs::GripperTranslation calculateApproachDirection(geometry_msgs::Pose msg_pose_grasp_FOOTPRINT_from_ARM7, geometry_msgs::Pose msg_pose_pre_FOOTPRINT_from_ARM7);
+	moveit_msgs::GripperTranslation calculateApproachDirection(geometry_msgs::Pose msg_pose_grasp_FOOTPRINT_from_ARM7, geometry_msgs::Pose msg_pose_pre_FOOTPRINT_from_ARM7);
 
 };
 #endif

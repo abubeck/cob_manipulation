@@ -1,34 +1,43 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(cob_grasp_generation)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_find_ros_package(actionlib_msgs)
-include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
-genaction()
+find_package(catkin REQUIRED COMPONENTS rospy message_generation actionlib actionlib_msgs std_msgs moveit_msgs)
 
-rosbuild_init()
- 
-#set the default path for built executables to the "bin" directory
-#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-#set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+catkin_python_setup()
 
-#uncomment if you have defined messages
-rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+#######################################
+## Declare ROS messages and services ##
+#######################################
+
+add_action_files(
+  FILES
+  GenerateGrasps.action
+  QueryGrasps.action
+  ShowGrasps.action
+)
+
+generate_messages(
+  DEPENDENCIES std_msgs actionlib_msgs moveit_msgs
+)
+
+
+###################################
+## catkin specific configuration ##
+###################################
+
+catkin_package(
+    CATKIN_DEPENDS rospy message_runtime actionlib actionlib_msgs std_msgs moveit_msgs tf geometry_msgs
+    DEPENDS # TODO
+    INCLUDE_DIRS 
+    LIBRARIES # TODO
+)
+
+install(DIRECTORY files
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(PROGRAMS scripts/cob_grasp_generation_action_server.py scripts/generate_grasps_client.py scripts/query_grasps_client.py scripts/show_grasps_client.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/scripts
+)
